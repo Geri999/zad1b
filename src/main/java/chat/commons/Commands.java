@@ -1,0 +1,12 @@
+package chat.commons;
+
+public enum Commands {
+    $USERS_LIST_REQUEST,
+    $LOGIN_REQUEST,
+    $LOGOUT_REQUEST,
+    $BROADCAST_TEXT_MSG,
+    $CREATE_ROOM_REQUEST,
+    $FIND_ROOM_ID_BY_USERNAME_MSG,
+    $SEND_FILE_MSG,
+    $LEAVING_THE_ROOM_REQUEST
+}

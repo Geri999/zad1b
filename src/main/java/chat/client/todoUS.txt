@@ -1,0 +1,17 @@
+
+
+
+---------------
+
+przesyłanie pliku
+1) komenda w czasie rozmowy
+2) wskazanie pliku
+3) samo przesłanie pliku do każdego z użytkowników
+4) odbiór pliku przez innych użytkownikó, jak już taki plik istnienie to ddoaje "(1)" lub datę i sekundy do nazwy
+5) info ze udało się plik zapisać
+
+
+----------------------
+
+
+https://www.oracle.com/java/technologies/jpl2-socket-communication.html
