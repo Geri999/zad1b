@@ -1,4 +1,4 @@
-package com;
+package temp;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

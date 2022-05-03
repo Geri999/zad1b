@@ -1,6 +1,5 @@
-package chat.commons.n;
+package chat.commons;
 
-import chat.commons.Commands;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

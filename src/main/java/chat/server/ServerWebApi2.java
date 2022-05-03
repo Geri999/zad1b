@@ -1,4 +1,4 @@
-package chat.server.controller;
+package chat.server;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -1,6 +1,6 @@
 package chat.server.repository;
 
-import chat.commons.n.Room2;
+import chat.commons.Room2;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -67,8 +67,4 @@ public class Room2Repo {
 
 
     }
-
-
-
-
 }

@@ -1,4 +1,4 @@
-package chat.commons.n;
+package chat.commons;
 
 import lombok.NoArgsConstructor;
 

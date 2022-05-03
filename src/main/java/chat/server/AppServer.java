@@ -1,7 +1,7 @@
 package chat.server;
 
-import chat.commons.n.Room2;
-import chat.commons.n.User2;
+import chat.commons.Room2;
+import chat.commons.User2;
 import chat.server.repository.UsersRepo;
 import chat.commons.IOTools;
 import chat.server.repository.MessagesRepo;

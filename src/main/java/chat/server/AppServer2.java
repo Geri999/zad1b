@@ -1,17 +1,14 @@
 package chat.server;
 
-import chat.commons.n.Room2;
-import chat.commons.n.User2;
-import chat.server.repository.UsersRepo;
 import chat.commons.IOTools;
 import chat.server.repository.MessagesRepo;
 import chat.server.repository.Room2Repo;
 import chat.server.repository.RoomsRepo;
+import chat.server.repository.UsersRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.io.IOException;
@@ -27,17 +24,20 @@ public class AppServer2 {
     private int maxClients;
     private ExecutorService executorService;
 
+    //    @Inject
     private MessagesRepo messagesRepo;
+//    @Inject
     private RoomsRepo roomsRepo;
-    @Inject
-    private Room2Repo room2Repo;
+//    @Inject
     private UsersRepo usersRepo;
+//    @Inject
+    private Room2Repo room2Repo;
 
     public static void main(String[] args) {
         log.info("Application started...");
         Weld weld = new Weld();
-        weld.enableDiscovery()
-                .addPackage(true, AppServer2.class);
+//        weld.enableDiscovery()
+//                .addPackage(true, AppServer2.class);
         WeldContainer container = weld.initialize();
         new AppServer2();
 
@@ -51,17 +51,18 @@ public class AppServer2 {
 
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("defaultH2");
-room2Repo.
+        log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        room2Repo.createEmptyRoomAndReturnRoomId("WaitingRoom");
 
-
-        EntityManager entityManager = emf.createEntityManager();
+/*
+                EntityManager entityManager = emf.createEntityManager();
         Room2 adminRoom = new Room2();
         User2 admin = new User2("Admin", adminRoom);
 
         entityManager.getTransaction().begin();
         entityManager.persist(admin);
         entityManager.getTransaction().commit();
-        entityManager.close();
+        entityManager.close();*/
 
         loadServerConfiguration();
         startTheServer();
