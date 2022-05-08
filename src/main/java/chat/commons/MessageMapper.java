@@ -3,10 +3,6 @@ package chat.commons;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.net.Socket;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,13 +10,19 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class MessageMapper {
 
-    private Commands command;
+/*    private Commands command;
     private User sender;
     private Room destinationRoom;
-    private String messageStrings;
+    private String messageStrings;*/
 
-    public static String createLoginMessage(Commands command, String userName, Socket socket) {
-        return command + "|" + userName + "|" + socket.getInetAddress() + "#" + socket.getPort() + "#" + socket.getLocalPort();
+    //Command to String
+    public static String messageConverter(Commands command, String senderName, Long roomId, String messageContent) {
+        return command + "|" + senderName + "|" + roomId.toString() + "|" + messageContent;
+    }
+
+
+    public static String createLoginMessage(Commands command, String userName) {
+        return command + "|" + userName;
     }
 
     public static String createAllUsersListMessage(Commands command) {
@@ -31,12 +33,11 @@ public class MessageMapper {
         return command + "|" + roomUsers.stream().collect(Collectors.joining("#"));
     }
 
-    public static List<String> stringToListParser(String input) {
-        return Arrays.stream(input.split("#")).collect(Collectors.toList());
-    }
+
+    //String to Command parser
 
     public static String createChatTxtMessage(Commands command, String sender, String roomId, String text) {
-                return command + "|" +sender + "|" +  roomId + "|" +text;
+        return command + "|" + sender + "|" + roomId + "|" + text;
     }
 
     public static String createExitMessage(Commands command, String userName) {
@@ -47,13 +48,16 @@ public class MessageMapper {
         return command + "|" + userName;
     }
 
-    public static void printFormattedMessageOnConsole(String sender, String messageStrings) {
-        String timeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
-        System.out.printf("[%s from %s]: %s\n", timeNow, sender, messageStrings);
-    }
 
-    @Override
-    public String toString() {
-        return command + "|" + sender + "|" + destinationRoom + "|" + messageStrings;
-    }
+/*    public static List<String> stringToListParser(String input) {
+        return Arrays.stream(input.split("#")).collect(Collectors.toList());
+    }*/
+
+    //##############################################################################################################
+
+
+//    @Override
+//    public String toString() {
+//        return command + "|" + sender + "|" + destinationRoom + "|" + messageStrings;
+//    }
 }

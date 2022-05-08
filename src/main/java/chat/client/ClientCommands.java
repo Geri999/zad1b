@@ -24,12 +24,13 @@ public class ClientCommands {
         int counter = 0;
         while (counter < 3) {
             System.out.printf("What's your name(Login)? %s", client.getPrompt());
-            String clientName = new Scanner(System.in).nextLine();
-            String loginMessage = MessageMapper.createLoginMessage(Commands.$LOGIN_REQUEST, clientName, client.getSocket());
-            boolean result = Boolean.parseBoolean(WriterToServer.sendToServerWithResponse(loginMessage, client));
+            String userName = new Scanner(System.in).nextLine();
+            String loginRequestOld = MessageMapper.createLoginMessage(Commands.$LOGIN_REQUEST, userName);
+            String loginRequest = MessageMapper.messageConverter(Commands.$LOGIN_REQUEST, userName, null, null);
+            boolean result = Boolean.parseBoolean(WriterToServer.sendToServerWithResponse(loginRequest, client));
 
             if (result) {
-                client.setClientName(clientName);
+                client.setClientName(userName);
                 client.setLogged(true);
                 return;
             } else {

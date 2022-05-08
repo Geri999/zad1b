@@ -1,30 +1,44 @@
 package chat.server;
 
-import chat.commons.User;
-import chat.server.repository.UsersRepo;
 import chat.commons.IOTools;
-import chat.commons.MessageMapper;
-import chat.commons.Room;
+import chat.commons.entities.Room;
+import chat.commons.entities.User;
 import chat.server.repository.MessagesRepo;
 import chat.server.repository.RoomsRepo;
-import lombok.Builder;
+import chat.server.repository.UsersRepo;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Data
-@Builder
-public class ServerAPI {
+@NoArgsConstructor
+public class CommandInterpreter {
+//    @Inject
+    private MessagesRepo messagesRepo;
+//    @Inject
+    private RoomsRepo roomsRepo;
+//    @Inject
+    private UsersRepo usersRepo;
+    private Socket socket;
 
-    private final MessagesRepo messagesRepo;
-    private final RoomsRepo roomsRepo;
-    private final UsersRepo usersRepo;
-    private final Socket socket;
+    @Inject
+    public CommandInterpreter(MessagesRepo messagesRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
+        this.messagesRepo = messagesRepo;
+        this.roomsRepo = roomsRepo;
+        this.usersRepo = usersRepo;
+    }
+
+    /*    public ServerAPI(Socket socket) {
+        this.socket = socket;
+    }*/
 
     public void commandInterpreter(String message, PrintWriter output) {
         String command = message.split("\\|")[0];
@@ -34,7 +48,7 @@ public class ServerAPI {
                 loginUserAndReturnInfoToClient(message, output);
                 break;
             case "$USERS_LIST_REQUEST":
-                createAndReturnUserListToServer(output);
+                sendCurrentUserListToServer(output);
                 break;
             case "$LOGOUT_REQUEST":
                 logoutUserRequest(message, output);
@@ -46,22 +60,54 @@ public class ServerAPI {
                 createRoomAndReturnInfoToClient(message, output);
                 break;
             case "$BROADCAST_TEXT_MSG":
-                receiveAndBrodcastChatText(message);
+                receiveAndBroadcastChatText(message);
                 break;
             case "$SEND_FILE_MSG":
                 IOTools.receiveAndSaveFile(socket, usersRepo);
                 break;
             case "$LEAVING_THE_ROOM_REQUEST":
-                receiveAndBrodcastChatText(message);
+                receiveAndBroadcastChatText(message);
                 //todo
                 usersRepo.removeUserFromRoom(message);
                 break;
         }
     }
 
-    private void receiveAndBrodcastChatText(String message) {
+
+    private void loginUserAndReturnInfoToClient(String message, PrintWriter output) {
+        String[] split = message.split("\\|");
+        String userName = split[1];
+        usersRepo.addUser(new User(userName, socket));
+        output.println("true");
+        log.info("GP: User logged and added to Waiting Room");
+    }
+
+
+    private void sendCurrentUserListToServer(PrintWriter output) {
+        String collect = usersRepo.findAllCurrentUsers().stream().map(User::getUserName).collect(Collectors.joining("|"));
+        output.println(collect);
+        log.info("GP: User list prepared and sent to Client");
+    }
+
+
+    private void logoutUserRequest(String message, PrintWriter output) {
+        User user = usersRepo.findUserByName(message.split("\\|")[1]);
+        usersRepo.removeUserFromRoom(user.getUserName());
+
+        output.println(true);
+        //todo zamknij pokój gdy było ich tylko 2, odejmij z pokojów wielosobowych, odejmij z listy klientów
+        log.info("GP: (Logout) User removed from usersRepo");
+    }
+
+
+
+
+
+
+
+    private void receiveAndBroadcastChatText(String message) {
         String[] splitChat = message.split("\\|");
-        String roomId = splitChat[2];
+        Long roomId = Long.parseLong(splitChat[2]);
         String text = splitChat[3];
 
         log.info("case=$BROADCAST_TEXT_MSG, room id={}", roomId);
@@ -75,7 +121,7 @@ public class ServerAPI {
 
     private void createRoomAndReturnInfoToClient(String message, PrintWriter output) {
         String s = message.split("\\|")[1];
-        List<String> userNameForRoomList = MessageMapper.stringToListParser(s);
+        List<String> userNameForRoomList = stringToListParser(s);
 
         Room room = new Room();
 
@@ -103,27 +149,13 @@ public class ServerAPI {
         output.println(roomId);
     }
 
-    private void logoutUserRequest(String message, PrintWriter output) {
-        User userByName = usersRepo.findUserByName(message.split("\\|")[1]);
-        boolean operationResult = usersRepo.getUserLists().remove(userByName);
-        output.println(operationResult);
-        //todo zamknij pokój gdy było ich tylko 2, odejmij z pokojów wielosobowych, odejmij z listy klientów
-        //ale to jest logout, to nie trzeba gdy robi logout, bo wyjsce z czatu to go kasuje z pokoii.
-        log.info("User removed from usersRepo"); //todo second condition, when "false"
+
+
+
+    public static List<String> stringToListParser(String input) {
+        return Arrays.stream(input.split("#")).collect(Collectors.toList());
     }
 
-    private void createAndReturnUserListToServer(PrintWriter output) {
-        String collect = usersRepo.getUserLists().stream().map(User::getName).collect(Collectors.joining("|"));
-        output.println(collect);
-        log.info("User list prepared and sent");
-    }
 
-    private void loginUserAndReturnInfoToClient(String message, PrintWriter output) {
-        String[] split = message.split("\\|");
-        String userName = split[1];
-        Socket socketFromInput = socket;
-        usersRepo.addUser(new User(userName, socketFromInput));
-        output.println("true");
-        log.info("User added");
-    }
+
 }

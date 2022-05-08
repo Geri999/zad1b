@@ -1,41 +1,73 @@
 package chat.server.repository;
 
-import chat.commons.User;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import chat.commons.entities.Room;
+import chat.commons.entities.User;
 
-import java.util.ArrayList;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@Data
-@Slf4j
-//method #1 by ReadWriteLock
+@Singleton
 public class UsersRepo {
 
-    ReadWriteLock locker = new ReentrantReadWriteLock();
-    private List<User> userLists = new ArrayList<>();
+    private EntityManagerFactory emf;
+    @Inject
+    RoomsRepo roomsRepo;
 
-
-    public boolean addUser(User user) {
-        locker.writeLock().lock();
-        boolean addResult = userLists.add(user);
-        locker.writeLock().unlock();
-        return addResult;
+    @Inject
+    public UsersRepo(EntityManagerFactory emf) {
+        this.emf = emf;
     }
 
-    public boolean removeUserFromRoom(String userName) {
-        locker.writeLock().lock();
-        boolean removeResult = userLists.remove(findUserByName(userName));
-        locker.writeLock().unlock();
-        return removeResult;
+    public void addUser(User user) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Room waitingRoom = roomsRepo.findRoomByRoomName("WaitingRoom");
+        user.setRoom(waitingRoom);
+        em.persist(user);
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public void removeUserFromRoom(String userName) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.remove(findUserByName(userName));
+        em.getTransaction().commit();
+        em.close();
     }
 
     public User findUserByName(String name) {
-        locker.readLock().lock();
-        User user = userLists.stream().filter(s -> s.getName().equals(name)).findFirst().get();
-        locker.readLock().unlock();
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User as u WHERE u.userName = :name", User.class);
+        query.setParameter("name", name);
+        User user = query.getSingleResult();
+        em.getTransaction().commit();
+        em.close();
+
         return user;
     }
+
+
+
+
+
+
+    public List<User> findAllCurrentUsers() {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User as u", User.class);
+        List<User> resultList = query.getResultList();
+        em.getTransaction().commit();
+        em.close();
+
+        return resultList;
+    }
+
+
+
 }

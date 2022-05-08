@@ -1,5 +1,7 @@
 package chat.commons;
 
+import chat.commons.entities.Room;
+import chat.commons.entities.User;
 import chat.server.repository.UsersRepo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +21,7 @@ public class IOTools {
 
     private static String mainPath = (new File("").getAbsolutePath() + "\\src\\main\\resources\\");
 
+    @Deprecated(forRemoval = true)
     public static HashMap<String, String> loadConfigFile() {
 
         HashMap<String, String> configMap = new HashMap<>();
@@ -133,7 +136,7 @@ public class IOTools {
             log.info("Odbiór pliku: długość: {}, odbiorca:{}, nazwa pliku: {}", sizeOfFile, recipientName, fileName);
 
             User userByRecipientName = usersRepo.findUserByName(recipientName);
-            log.info("Odbiór pliku: znaleziony po Name:{},{}", userByRecipientName.getName(), userByRecipientName.getSocket());
+            log.info("Odbiór pliku: znaleziony po Name:{},{}", userByRecipientName.getUserName(), userByRecipientName.getSocket());
 
             File file = new File(mainPath + separator + downloadFolder + separator + fileName);
 
