@@ -1,28 +1,28 @@
 package chat.server;
 
 import chat.commons.IOTools;
+import chat.commons.entities.MessageTxt;
 import chat.commons.entities.Room;
 import chat.commons.entities.User;
-import chat.server.repository.MessagesRepo;
+import chat.server.repository.MessagesTxtRepo;
 import chat.server.repository.RoomsRepo;
 import chat.server.repository.UsersRepo;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Data
-@NoArgsConstructor
 public class CommandInterpreter {
 //    @Inject
-    private MessagesRepo messagesRepo;
+    private MessagesTxtRepo messagesTxtRepo;
 //    @Inject
     private RoomsRepo roomsRepo;
 //    @Inject
@@ -30,10 +30,14 @@ public class CommandInterpreter {
     private Socket socket;
 
     @Inject
-    public CommandInterpreter(MessagesRepo messagesRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
-        this.messagesRepo = messagesRepo;
+    public CommandInterpreter(MessagesTxtRepo messagesTxtRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
+        this.messagesTxtRepo = messagesTxtRepo;
         this.roomsRepo = roomsRepo;
         this.usersRepo = usersRepo;
+    }
+
+    public CommandInterpreter() {
+        log.info("GP: CommandInterpreter created...");
     }
 
     /*    public ServerAPI(Socket socket) {
@@ -45,19 +49,19 @@ public class CommandInterpreter {
         log.info(command);
         switch (command) {
             case "$LOGIN_REQUEST":
-                loginUserAndReturnInfoToClient(message, output);
+                loginRequest(message, output);
                 break;
             case "$USERS_LIST_REQUEST":
-                sendCurrentUserListToServer(output);
+                currentUserListRequest(output);
                 break;
             case "$LOGOUT_REQUEST":
-                logoutUserRequest(message, output);
+                logoutRequest(message, output);
                 break;
             case "$FIND_ROOM_ID_BY_USERNAME_MSG":
-                findAndReturnToClientRoomId(message, output);
+                oneRoomIdByUserNameRequest(message, output);
                 break;
             case "$CREATE_ROOM_REQUEST":
-                createRoomAndReturnInfoToClient(message, output);
+                roomCreationRequest(message, output);
                 break;
             case "$BROADCAST_TEXT_MSG":
                 receiveAndBroadcastChatText(message);
@@ -74,7 +78,7 @@ public class CommandInterpreter {
     }
 
 
-    private void loginUserAndReturnInfoToClient(String message, PrintWriter output) {
+    private void loginRequest(String message, PrintWriter output) {
         String[] split = message.split("\\|");
         String userName = split[1];
         usersRepo.addUser(new User(userName, socket));
@@ -83,20 +87,53 @@ public class CommandInterpreter {
     }
 
 
-    private void sendCurrentUserListToServer(PrintWriter output) {
+    private void currentUserListRequest(PrintWriter output) {
         String collect = usersRepo.findAllCurrentUsers().stream().map(User::getUserName).collect(Collectors.joining("|"));
         output.println(collect);
         log.info("GP: User list prepared and sent to Client");
     }
 
 
-    private void logoutUserRequest(String message, PrintWriter output) {
+    private void logoutRequest(String message, PrintWriter output) {
         User user = usersRepo.findUserByName(message.split("\\|")[1]);
         usersRepo.removeUserFromRoom(user.getUserName());
 
         output.println(true);
         //todo zamknij pokój gdy było ich tylko 2, odejmij z pokojów wielosobowych, odejmij z listy klientów
         log.info("GP: (Logout) User removed from usersRepo");
+    }
+
+    private void oneRoomIdByUserNameRequest(String message, PrintWriter output) {
+        //find one room only !!!!!!!!!!!!!//todo
+        User user = usersRepo.findUserByName(message.split("\\|")[1]);
+        List<Room> rooms = roomsRepo.findAllRoomsByUserNameWhereIsUser(user.getUserName());
+        String roomId;
+        if (rooms.size() < 1) {
+            roomId = "empty";
+        } else {
+            roomId = rooms.stream().findFirst().get().getRoomId().toString();
+        }
+        output.println(roomId);
+    }
+
+
+    private void roomCreationRequest(String message, PrintWriter output) {
+        String usersInvitedToChat = message.split("\\|")[3];
+        List<String> usersInvitedToChatList = stringToListParser(usersInvitedToChat);
+
+        Room room = new Room();
+
+        for (String userName : usersInvitedToChatList) {
+            User userByName = usersRepo.findUserByName(userName);
+            room.getUsersInRoom().add(userByName);
+        }
+
+        long roomId = roomsRepo.createRoomWithUsers(room);
+        output.println(roomId);
+    }
+
+    public static List<String> stringToListParser(String input) {
+        return Arrays.stream(input.split("#")).collect(Collectors.toList());
     }
 
 
@@ -110,51 +147,26 @@ public class CommandInterpreter {
         Long roomId = Long.parseLong(splitChat[2]);
         String text = splitChat[3];
 
-        log.info("case=$BROADCAST_TEXT_MSG, room id={}", roomId);
+        log.info("GP: case=$BROADCAST_TEXT_MSG, room id={}", roomId);
 
         Room roomById = roomsRepo.findRoomById(roomId);
-
+        List<User> usersSet = roomsRepo.findAllUsersInTheRoom(roomId);
+        HashSet<User> users = new HashSet<>(usersSet);
         roomById.broadcastToAllRoomParticipant(message);
         IOTools.saveMessageToFile(message, roomById);
-        log.info("broadcasting text={}", message);
-    }
-
-    private void createRoomAndReturnInfoToClient(String message, PrintWriter output) {
-        String s = message.split("\\|")[1];
-        List<String> userNameForRoomList = stringToListParser(s);
-
-        Room room = new Room();
-
-        for (String userN : userNameForRoomList) {
-            User userByName1 = usersRepo.findUserByName(userN);
-            room.getUserListInRoom().add(userByName1);
-        }
-
-        //todo: sprawdz czy już taki pokój istnieje, jesli nie to nie ma co dodawać, tylko zwróc jego ID
-        roomsRepo.getRoomsList().add(room);
-        output.println(room.getRoomId());
-    }
-
-    //todo przenieść do roomRepo
-    private void findAndReturnToClientRoomId(String message, PrintWriter output) {
-        //find one room only
-        User user = usersRepo.findUserByName(message.split("\\|")[1]);
-        List<Room> rooms = roomsRepo.findRoomByUserName(user.getName());
-        String roomId;
-        if (rooms.size() < 1) {
-            roomId = "empty";
-        } else {
-            roomId = rooms.stream().findFirst().get().getRoomId();
-        }
-        output.println(roomId);
+        messagesTxtRepo.save(new MessageTxt(users   , text));
+        log.info("GP: Broadcasting text={}", message);
+        log.info("GP: text saved to hdd and to DB: text:{}, roomId:{}", text, roomById);
     }
 
 
 
 
-    public static List<String> stringToListParser(String input) {
-        return Arrays.stream(input.split("#")).collect(Collectors.toList());
-    }
+
+
+
+
+
 
 
 

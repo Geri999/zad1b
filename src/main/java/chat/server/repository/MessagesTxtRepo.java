@@ -1,6 +1,6 @@
 package chat.server.repository;
 
-import chat.commons.entities.Message;
+import chat.commons.entities.MessageTxt;
 import chat.commons.entities.User;
 
 import javax.inject.Inject;
@@ -11,32 +11,33 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Singleton
-public class MessagesRepo {
+public class MessagesTxtRepo {
 
     private EntityManagerFactory emf;
 
     @Inject
-    public MessagesRepo(EntityManagerFactory emf) {
+    public MessagesTxtRepo(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
 
-    public void save(Message message) {
+    public void save(MessageTxt messagetxt) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(message);
+        em.persist(messagetxt);
         em.getTransaction().commit();
         em.close();
     }
 
-    public List<Message> readMessageByUser(User user) {
+    public List<MessageTxt> readMessageByUser(User user) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
 
-        TypedQuery<Message> query =
-                em.createQuery("SELECT m FROM Message AS m LEFT JOIN User AS u ON m.sender.user_id = u.user_id WHERE u.userName =: user", Message.class);
+        TypedQuery<MessageTxt> query =
+//                em.createQuery("SELECT m FROM MessageTxt AS m LEFT JOIN User AS u ON m..user_id = u.user_id WHERE u.userName =: user", MessageTxt.class);
+                em.createQuery("SELECT m FROM MessageTxt AS m LEFT JOIN User AS u WHERE u.userName =: user", MessageTxt.class);
         em.setProperty("user", user.getUserName());
-        List<Message> resultList = query.getResultList();
+        List<MessageTxt> resultList = query.getResultList();
         em.getTransaction().commit();
         em.close();
 

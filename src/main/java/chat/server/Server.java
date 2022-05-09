@@ -16,15 +16,8 @@ public class Server {
     private int port;
     private int maxClients;
     private ExecutorService executorService;
-
-//    @Inject
-//    private MessagesRepo messagesRepo;
-//    @Inject
+    @Inject
     private RoomsRepo roomsRepo;
-//    @Inject
-//    private UsersRepo usersRepo;
-
-
 
     public void start() {
         roomsRepo.createEmptyRoomAndReturnRoomId("WaitingRoom");

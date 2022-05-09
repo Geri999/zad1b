@@ -1,5 +1,6 @@
 package chat.server;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -10,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 @Slf4j
+@NoArgsConstructor
 public class ServerWorker implements Runnable {
 //    @Inject
 //    private MessagesRepo messagesRepo;
@@ -17,11 +19,11 @@ public class ServerWorker implements Runnable {
 //    private RoomsRepo roomsRepo;
 //    @Inject
 //    private UsersRepo usersRepo;
-    private final Socket socket;
+    private  Socket socket;
     @Inject
     private CommandInterpreter commandInterpreter;
 
-    @Inject
+//    @Inject
     public ServerWorker(Socket socket) {
 //        this.messagesRepo = messagesRepo;
 //        this.roomsRepo = roomsRepo;

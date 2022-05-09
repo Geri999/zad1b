@@ -16,8 +16,8 @@ public class MessageMapper {
     private String messageStrings;*/
 
     //Command to String
-    public static String messageConverter(Commands command, String senderName, Long roomId, String messageContent) {
-        return command + "|" + senderName + "|" + roomId.toString() + "|" + messageContent;
+    public static String messageConverter(Commands command, String senderName, String roomId, String messageContent) {
+        return command + "|" + senderName + "|" + roomId + "|" + messageContent;
     }
 
 

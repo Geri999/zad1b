@@ -1,6 +1,5 @@
 package chat.client;
 
-import chat.client.view.ClientGui;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

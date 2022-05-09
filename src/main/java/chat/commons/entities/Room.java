@@ -1,6 +1,9 @@
 package chat.commons.entities;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -19,7 +22,7 @@ import java.util.stream.Collectors;
 public class Room {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ROOM_ID")
     private Long roomId;
 
@@ -30,7 +33,7 @@ public class Room {
     @Column(name = "USERS_IN_ROOM")
     @ToString.Exclude
     @OneToMany(mappedBy = "room")
-    private Set<User> usersInRoom;
+    private Set<User> usersInRoom /*= new HashSet<>()*/;
 
     public Room(String roomName) {
         this.roomName = roomName;

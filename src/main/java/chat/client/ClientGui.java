@@ -1,7 +1,5 @@
-package chat.client.view;
+package chat.client;
 
-import chat.client.Client;
-import chat.client.ClientCommands;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;

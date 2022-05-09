@@ -45,7 +45,7 @@ public class ChatService {
     private String findRoomIdByClient(Client client) {
         String findRoomIdByUserNameMessage = MessageMapper.createFindRoomIdByUserNameMessage(Commands.$FIND_ROOM_ID_BY_USERNAME_MSG, client.getClientName());
         String roomId = WriterToServer.sendToServerWithResponse(findRoomIdByUserNameMessage, client);
-        log.info("ID room by UserName={}", roomId);
+        log.info("GP: ID room by UserName={}", roomId);
         return "empty".equals(roomId) ? "empty" : roomId;
     }
 
@@ -77,7 +77,9 @@ public class ChatService {
                     : String.format("Sorry, %s is NOT on-line.", inputUserName));
         }
 
-        String requestForRoomMessage = MessageMapper.createRequestForRoomMessage(Commands.$CREATE_ROOM_REQUEST, usersInvitedToChat);
+//        String requestForRoomMessage = MessageMapper.createRequestForRoomMessage(Commands.$CREATE_ROOM_REQUEST, usersInvitedToChat);
+        String collect = usersInvitedToChat.stream().collect(Collectors.joining("#"));
+        String requestForRoomMessage = MessageMapper.messageConverter(Commands.$CREATE_ROOM_REQUEST, client.getClientName(), "newRoom", collect);
         String roomId = WriterToServer.sendToServerWithResponse(requestForRoomMessage, client);
 
         return roomId;
@@ -106,18 +108,18 @@ public class ChatService {
                 case "@END":
                     loopCondition = false;
                     text = client.getClientName()+ "leaved the room.";
-                    message = MessageMapper.createChatTxtMessage(Commands.$LEAVING_THE_ROOM_REQUEST, client.getClientName(), roomId, text);
+                    message = MessageMapper.messageConverter(Commands.$LEAVING_THE_ROOM_REQUEST, client.getClientName(), roomId, text);
                     WriterToServer.sendToServer(message, client);
                     break;
                 case "@send":
                 case "@SEND":
-                    message = MessageMapper.createChatTxtMessage(Commands.$SEND_FILE_MSG, client.getClientName(), roomId, text);
+                    message = MessageMapper.messageConverter(Commands.$SEND_FILE_MSG, client.getClientName(), roomId, text);
                     WriterToServer.sendToServer(message, client);
                     IOTools.sendFile(client.getSocket());
                     log.info("End of @SEND command");
                     break;
                 default:
-                    message = MessageMapper.createChatTxtMessage(Commands.$BROADCAST_TEXT_MSG, client.getClientName(), roomId, text);
+                    message = MessageMapper.messageConverter(Commands.$BROADCAST_TEXT_MSG, client.getClientName(), roomId, text);
                     WriterToServer.sendToServer(message, client);
                     log.info(Commands.$BROADCAST_TEXT_MSG.toString());
                     log.info(client.getClientName());

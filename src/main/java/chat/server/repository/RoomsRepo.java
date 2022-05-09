@@ -2,8 +2,9 @@ package chat.server.repository;
 
 import chat.commons.BeginAndCommit;
 import chat.commons.entities.Room;
+import chat.commons.entities.User;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -12,8 +13,9 @@ import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.util.List;
 
-@ApplicationScoped
+//@ApplicationScoped
 @Singleton
+@Slf4j
 public class RoomsRepo implements Serializable {
     private static final long serialVersionUID = 1L;
     private EntityManagerFactory emf;
@@ -29,18 +31,24 @@ public class RoomsRepo implements Serializable {
     }
 
     //@Transactional  ?????????? todo: sprawdz to
-    public void createRoomWithUsers(Room room) {
+    public long createRoomWithUsers(Room room) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         em.persist(room);
+        em.flush();
+        Long roomId = room.getRoomId();
+        log.info("GP: Room ID during room creation: {}", roomId);
+
         em.getTransaction().commit();
         em.close();
+        return  roomId;
     }
 
 
     public long createEmptyRoomAndReturnRoomId(String roomName) {
         EntityManager em = emf.createEntityManager();
         Room room = new Room(roomName);
+//        room.
         //todo sprawdzenie czy nie ma już pokoju z taką samą nazwą
         em.getTransaction().begin();
         em.persist(room);
@@ -94,6 +102,19 @@ public class RoomsRepo implements Serializable {
         TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r left join User as u on u.room.roomId=r.roomId where u.userName = :userName", Room.class);
         query.setParameter("userName", userName);
         List<Room> resultList = query.getResultList();
+
+        em.getTransaction().commit();
+        em.close();
+        return resultList;
+    }
+
+    public List<User> findAllUsersInTheRoom(Long roomId) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        TypedQuery<User> query = em.createQuery("SELECT r FROM Room as r left join User as u  WHERE r.roomId = :roomId", User.class);
+        query.setParameter("roomId", roomId);
+        List<User> resultList = query.getResultList();
 
         em.getTransaction().commit();
         em.close();

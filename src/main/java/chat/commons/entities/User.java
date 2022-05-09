@@ -3,16 +3,15 @@ package chat.commons.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.net.Socket;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "CHAT_USER")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -33,9 +32,8 @@ public class User {
     @JoinColumn(name = "ROOM_ID")
     private Room room;
 
-    @OneToMany(mappedBy = "sender")
-    @ToString.Exclude
-    private List<Message> messagesList;/* = new LinkedList<>();*/
+    @ManyToMany(mappedBy = "messageReceiversUserSet")
+    private Set<MessageTxt> messagesList;
 
 
     public User(String userName, Socket socket) {

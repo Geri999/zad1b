@@ -8,7 +8,7 @@ import org.jboss.weld.environment.se.WeldContainer;
 public class AppServer {
 
     public static void main(String[] args) {
-        log.info("GP: Application started...");
+        log.info("GP: Server App started...");
         Weld weld = new Weld();
         WeldContainer container = weld.initialize();
         container.select(Server.class).get().start();
