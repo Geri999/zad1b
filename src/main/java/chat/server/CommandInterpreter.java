@@ -10,7 +10,6 @@ import chat.server.repository.UsersRepo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
@@ -30,7 +29,7 @@ public class CommandInterpreter {
     private UsersRepo usersRepo;
     private Socket socket;
 
-    @Inject
+
     public CommandInterpreter(MessagesTxtRepo messagesTxtRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
         log.info("GP: CommandInterpreter created...");
         this.messagesTxtRepo = messagesTxtRepo;
@@ -48,7 +47,7 @@ public class CommandInterpreter {
 
     public void commandInterpreter(String message, PrintWriter output) {
         String command = message.split("\\|")[0];
-        log.info(command);
+        log.info("GP: command: {}",command);
         switch (command) {
             case "$LOGIN_REQUEST":
                 loginRequest(message, output);
