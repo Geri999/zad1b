@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Data
+//@Default
 public class CommandInterpreter {
 //    @Inject
     private MessagesTxtRepo messagesTxtRepo;
@@ -31,6 +32,7 @@ public class CommandInterpreter {
 
     @Inject
     public CommandInterpreter(MessagesTxtRepo messagesTxtRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
+        log.info("GP: CommandInterpreter created...");
         this.messagesTxtRepo = messagesTxtRepo;
         this.roomsRepo = roomsRepo;
         this.usersRepo = usersRepo;

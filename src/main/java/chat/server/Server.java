@@ -19,6 +19,9 @@ public class Server {
     @Inject
     private RoomsRepo roomsRepo;
 
+    @Inject
+    private CommandInterpreter commandInterpreter;
+
     public void start() {
         roomsRepo.createEmptyRoomAndReturnRoomId("WaitingRoom");
         startTheServer();
@@ -38,7 +41,8 @@ public class Server {
                 log.info("GP: 1 - Server is listening...");
                 Socket socket = server.accept();
                 log.info("GP: 2 - Server accepted connection with client...Socket:{}", socket);
-                ServerWorker sw = new ServerWorker(socket);
+//                ServerWorker sw = new ServerWorker(socket);
+                ServerWorker sw = new ServerWorker(socket,commandInterpreter );
                 executorService.execute(sw);
                 log.info("GP: 3 - New thread (session) created...");
             }

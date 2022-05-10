@@ -1,9 +1,8 @@
 package chat.server;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,38 +10,27 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 @Slf4j
-@NoArgsConstructor
+@Data
 public class ServerWorker implements Runnable {
-//    @Inject
-//    private MessagesRepo messagesRepo;
-//    @Inject
-//    private RoomsRepo roomsRepo;
-//    @Inject
-//    private UsersRepo usersRepo;
     private  Socket socket;
-    @Inject
+//    @Inject
     private CommandInterpreter commandInterpreter;
 
-//    @Inject
-    public ServerWorker(Socket socket) {
-//        this.messagesRepo = messagesRepo;
-//        this.roomsRepo = roomsRepo;
-//        this.usersRepo = usersRepo;
+    public ServerWorker(Socket socket, CommandInterpreter commandInterpreter) {
         this.socket = socket;
-        commandInterpreter.setSocket(socket);
+        this.commandInterpreter = commandInterpreter;
+        log.info("GP: ServerWorker created ");
     }
 
     @Override
     public void run() {
-        log.info("GP: Server session started...");
-
+        log.info("GP: Server session started... on socket:{}", socket.toString());
 //        ServerAPI serverAPI = ServerAPI.builder()
 //                .messagesRepo(messagesRepo)
 //                .roomsRepo(roomsRepo)
 //                .usersRepo(usersRepo)
 //                .socket(socket)
 //                .build();
-
 
         try {
             BufferedReader inputS = new BufferedReader(new InputStreamReader(socket.getInputStream()));
