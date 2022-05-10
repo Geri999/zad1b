@@ -29,6 +29,7 @@ public class Server {
 
     @Inject
     private void loadServerConfiguration(Properties properties) {
+        String n = "asdad";
         port = Integer.parseInt(properties.getProperty("port"));
         maxClients = Integer.parseInt(properties.getProperty("threads"));
         executorService = Executors.newFixedThreadPool(maxClients);
