@@ -56,6 +56,7 @@ public class RoomsRepo implements Serializable {
         em.close();
 
         Room roomByRoomName = findRoomByRoomName(roomName);
+        findRoomByRoomName(roomName);
         return roomByRoomName.getRoomId();
     }
 
@@ -76,6 +77,7 @@ public class RoomsRepo implements Serializable {
         TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomId = :id", Room.class);
         query.setParameter("id", id);
         Room room = query.getSingleResult();
+        log.info("GP: znaleziony po ID:{}",room);
         em.getTransaction().commit();
         em.close();
 
@@ -84,13 +86,19 @@ public class RoomsRepo implements Serializable {
 
     public Room findRoomByRoomName(String roomName) {
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
+//        em.getTransaction().begin();
 
-        TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomName = :roomName", Room.class);
+        TypedQuery<Room> query1 = em.createQuery("SELECT r FROM Room r", Room.class);
+        System.out.println(query1.getResultList().size());
+
+
+        TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomName=:roomName", Room.class);
         query.setParameter("roomName", roomName);
+        System.out.println(roomName);
         Room room = query.getSingleResult();
+        System.out.println(room);
 
-        em.getTransaction().commit();
+//        em.getTransaction().commit();
         em.close();
         return room;
     }

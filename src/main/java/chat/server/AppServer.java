@@ -6,12 +6,13 @@ import org.jboss.weld.environment.se.WeldContainer;
 
 @Slf4j
 public class AppServer {
+    static WeldContainer container;
 
     public static void main(String[] args) {
         log.info("GP: Server App started...");
         Weld weld = new Weld();
-        WeldContainer container = weld.initialize();
-        container.select(Server.class).get().start();
+        container = weld.initialize();
+        container.select(Server.class).get().startTheServer();
 
         log.info("GP: Application ending...");
         container.shutdown();

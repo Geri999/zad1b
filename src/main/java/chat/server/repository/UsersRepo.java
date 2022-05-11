@@ -45,6 +45,7 @@ public class UsersRepo {
         em.getTransaction().begin();
         TypedQuery<User> query = em.createQuery("SELECT u FROM User as u WHERE u.userName = :name", User.class);
         query.setParameter("name", name);
+
         User user = query.getSingleResult();
         em.getTransaction().commit();
         em.close();

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Room {
 
     @Id
@@ -30,9 +31,8 @@ public class Room {
     @Column(name = "ROOM_NAME")
     private String roomName;
 
-    @Column(name = "USERS_IN_ROOM")
-    @ToString.Exclude
-    @OneToMany(mappedBy = "room")
+//    @Column(name = "USERS_IN_ROOM")
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     private Set<User> usersInRoom /*= new HashSet<>()*/;
 
     public Room(String roomName) {

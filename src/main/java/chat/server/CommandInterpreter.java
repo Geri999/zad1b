@@ -10,6 +10,7 @@ import chat.server.repository.UsersRepo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
@@ -19,31 +20,19 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Data
-//@Default
 public class CommandInterpreter {
-//    @Inject
     private MessagesTxtRepo messagesTxtRepo;
-//    @Inject
     private RoomsRepo roomsRepo;
-//    @Inject
     private UsersRepo usersRepo;
     private Socket socket;
 
-
+    @Inject
     public CommandInterpreter(MessagesTxtRepo messagesTxtRepo, RoomsRepo roomsRepo, UsersRepo usersRepo) {
-        log.info("GP: CommandInterpreter created...");
+        log.info("GP: CommandInterpreter was created...");
         this.messagesTxtRepo = messagesTxtRepo;
         this.roomsRepo = roomsRepo;
         this.usersRepo = usersRepo;
     }
-
-    public CommandInterpreter() {
-        log.info("GP: CommandInterpreter created...");
-    }
-
-    /*    public ServerAPI(Socket socket) {
-        this.socket = socket;
-    }*/
 
     public void commandInterpreter(String message, PrintWriter output) {
         String command = message.split("\\|")[0];
@@ -78,20 +67,19 @@ public class CommandInterpreter {
         }
     }
 
-
     private void loginRequest(String message, PrintWriter output) {
         String[] split = message.split("\\|");
         String userName = split[1];
         usersRepo.addUser(new User(userName, socket));
         output.println("true");
-        log.info("GP: User logged and added to Waiting Room");
+        log.info("GP: User was logged and added to Waiting Room");
     }
 
 
     private void currentUserListRequest(PrintWriter output) {
         String collect = usersRepo.findAllCurrentUsers().stream().map(User::getUserName).collect(Collectors.joining("|"));
         output.println(collect);
-        log.info("GP: User list prepared and sent to Client");
+        log.info("GP: User list was prepared and sent to Client");
     }
 
 
@@ -101,7 +89,7 @@ public class CommandInterpreter {
 
         output.println(true);
         //todo zamknij pokój gdy było ich tylko 2, odejmij z pokojów wielosobowych, odejmij z listy klientów
-        log.info("GP: (Logout) User removed from usersRepo");
+        log.info("GP: (Logout) User was removed from usersRepo");
     }
 
     private void oneRoomIdByUserNameRequest(String message, PrintWriter output) {
@@ -137,12 +125,6 @@ public class CommandInterpreter {
         return Arrays.stream(input.split("#")).collect(Collectors.toList());
     }
 
-
-
-
-
-
-
     private void receiveAndBroadcastChatText(String message) {
         String[] splitChat = message.split("\\|");
         Long roomId = Long.parseLong(splitChat[2]);
@@ -157,18 +139,6 @@ public class CommandInterpreter {
         IOTools.saveMessageToFile(message, roomById);
         messagesTxtRepo.save(new MessageTxt(users   , text));
         log.info("GP: Broadcasting text={}", message);
-        log.info("GP: text saved to hdd and to DB: text:{}, roomId:{}", text, roomById);
+        log.info("GP: Text was saved to hdd and to DB: text:{}, roomId:{}", text, roomById);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
