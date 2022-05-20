@@ -2,6 +2,7 @@ package chat.server.repository;
 
 import chat.commons.entities.Room;
 import chat.commons.entities.User;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -11,6 +12,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Singleton
+@Slf4j
 public class UsersRepo {
 
     private EntityManagerFactory emf;
@@ -26,7 +28,11 @@ public class UsersRepo {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         Room waitingRoom = roomsRepo.findRoomByRoomName("WaitingRoom");
-        user.setRoom(waitingRoom);
+//        user.setRoom(waitingRoom);  //????? "detached entity passed to persist:"
+        waitingRoom.addUser(user);
+        System.out.println(waitingRoom);
+        System.out.println(user);
+
         em.persist(user);
         em.getTransaction().commit();
         em.close();

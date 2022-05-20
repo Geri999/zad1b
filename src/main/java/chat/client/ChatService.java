@@ -96,7 +96,7 @@ public class ChatService {
         System.out.println("\n" + "*".repeat(20) + "CHAT STARTED:" + "*".repeat(20));
         System.out.println("(type @END to stop conversation)");
         System.out.println("(type @SEND to enter file sending menu)");
-        System.out.println("Ask your other chat participants to enter the room (menu item 4)");
+        System.out.println("Ask your other chat participants to enter the room (menu item 3)");
 
         String text;
         Scanner sc = new Scanner(System.in);

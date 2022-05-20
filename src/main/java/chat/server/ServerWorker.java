@@ -29,7 +29,7 @@ public class ServerWorker implements Runnable {
     @PostConstruct
     void postConstruct(){
         commandInterpreter.setSocket(socket);
-        log.info("GP: PostConstruct in SerwerWorker ");
+        log.info("GP: PostConstruct in ServerWorker ");
     }
 
     @Override

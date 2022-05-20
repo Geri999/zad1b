@@ -59,7 +59,7 @@ public class ClientCommands {
     }
 
     public static void joinToChatCommand(Client client) {
-        log.info("joinToChatCommand(Client client)");
+        log.info("GP: JoinToChatCommand(Client client)");
         Thread thread = new Thread(() -> new ChatService(client).joinToChat());
         thread.start();
         try {

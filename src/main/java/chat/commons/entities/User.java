@@ -3,10 +3,12 @@ package chat.commons.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,12 +17,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Slf4j
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "USER_ID")
-    private Long user_id;
+    private Long userId;
 
     @Column(name = "USER_NAME", nullable = false)
     private String userName;
@@ -28,22 +31,37 @@ public class User {
     @Transient
     private Socket socket;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "ROOM_ID")
+    @ManyToOne/*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
+    @JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
     private Room room;
 
     @ManyToMany(mappedBy = "messageReceiversUserSet")
     private Set<MessageTxt> messagesList;
 
 
+    public void addMessageTxt(MessageTxt messageTxt) {
+        if (messagesList == null) {
+            messagesList = new HashSet<>();
+        }
+        messagesList.add(messageTxt);
+        log.info("GP: messageTxt was added to User:{}{}", messageTxt, userId);
+    }
+
     public User(String userName, Socket socket) {
         this.userName = userName;
         this.socket = socket;
     }
 
+    public User(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
-        return userName + "#" + socket.getInetAddress() + "#" + socket.getPort() + "#" + socket.getLocalPort();
+        return "User{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", socket=" + socket+"}";
     }
 
     @Override
@@ -51,7 +69,7 @@ public class User {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         User user = (User) o;
-        return user_id != null && Objects.equals(user_id, user.user_id);
+        return userId != null && Objects.equals(userId, user.userId);
     }
 
     @Override

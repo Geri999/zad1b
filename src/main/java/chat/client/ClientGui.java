@@ -38,24 +38,24 @@ public class ClientGui {
             int userInput;
             switch (userInput = Integer.parseInt(sc.nextLine())) {
                 case (1):
-                    System.out.println(menuPositionGenerator().get(userInput - 1));
+                    menuItemPrinter(userInput);
                     ClientCommands.printUserListCommand(client);
                     break;
                 case (2):
-                    System.out.println(menuPositionGenerator().get(userInput - 1));
+                    menuItemPrinter(userInput);
                     ClientCommands.createChatCommand(client);
                     break;
                 case (3):
-                    System.out.println(menuPositionGenerator().get(userInput - 1));
+                    menuItemPrinter(userInput);
                     ClientCommands.joinToChatCommand(client);
                     break;
                 case (4):
-                    System.out.println(menuPositionGenerator().get(userInput - 1));
+                    menuItemPrinter(userInput);
                     ClientCommands.printAllMyChatsCommand(client);
                     break;
 
                 case (0):
-                    System.out.println(menuPositionGenerator().get(menuPositionGenerator().size() - 1));
+                    menuItemPrinter(menuPositionGenerator().size());
                     client.setLogged(ClientCommands.logoutCommand(client));
                     System.out.println("You have been successfully logged out");
                     System.exit(0);
@@ -64,6 +64,10 @@ public class ClientGui {
                     System.out.println("repeat please");
             }
         }
+    }
+
+    private void menuItemPrinter(int userInput) {
+        System.out.println(menuPositionGenerator().get(userInput - 1));
     }
 /*
     private boolean checkLoggingStatus() {

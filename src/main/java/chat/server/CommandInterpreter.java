@@ -36,7 +36,7 @@ public class CommandInterpreter {
 
     public void commandInterpreter(String message, PrintWriter output) {
         String command = message.split("\\|")[0];
-        log.info("GP: command: {}",command);
+        log.info("GP: command: {}", command);
         switch (command) {
             case "$LOGIN_REQUEST":
                 loginRequest(message, output);
@@ -51,7 +51,7 @@ public class CommandInterpreter {
                 oneRoomIdByUserNameRequest(message, output);
                 break;
             case "$CREATE_ROOM_REQUEST":
-                roomCreationRequest(message, output);
+                newRoomWithUsersCreationRequest(message, output);
                 break;
             case "$BROADCAST_TEXT_MSG":
                 receiveAndBroadcastChatText(message);
@@ -60,7 +60,7 @@ public class CommandInterpreter {
                 IOTools.receiveAndSaveFile(socket, usersRepo);
                 break;
             case "$LEAVING_THE_ROOM_REQUEST":
-                receiveAndBroadcastChatText(message);
+            receiveAndBroadcastChatText(message);
                 //todo
                 usersRepo.removeUserFromRoom(message);
                 break;
@@ -106,18 +106,12 @@ public class CommandInterpreter {
     }
 
 
-    private void roomCreationRequest(String message, PrintWriter output) {
+    private void newRoomWithUsersCreationRequest(String message, PrintWriter output) {
         String usersInvitedToChat = message.split("\\|")[3];
-        List<String> usersInvitedToChatList = stringToListParser(usersInvitedToChat);
+        List<String> usersNameInvitedToChatList = stringToListParser(usersInvitedToChat);
+        List<User> userList = usersNameInvitedToChatList.stream().map(u -> usersRepo.findUserByName(u)).collect(Collectors.toList());
 
-        Room room = new Room();
-
-        for (String userName : usersInvitedToChatList) {
-            User userByName = usersRepo.findUserByName(userName);
-            room.getUsersInRoom().add(userByName);
-        }
-
-        long roomId = roomsRepo.createRoomWithUsers(room);
+        long roomId = roomsRepo.createRoomAndMoveUsersToThatRoom(usersNameInvitedToChatList);
         output.println(roomId);
     }
 
@@ -133,11 +127,11 @@ public class CommandInterpreter {
         log.info("GP: case=$BROADCAST_TEXT_MSG, room id={}", roomId);
 
         Room roomById = roomsRepo.findRoomById(roomId);
-        List<User> usersSet = roomsRepo.findAllUsersInTheRoom(roomId);
+        List<User> usersSet = roomsRepo.findAllUsersInTheRoomByRoomId(roomId);
         HashSet<User> users = new HashSet<>(usersSet);
         roomById.broadcastToAllRoomParticipant(message);
         IOTools.saveMessageToFile(message, roomById);
-        messagesTxtRepo.save(new MessageTxt(users   , text));
+        messagesTxtRepo.save(new MessageTxt(users, text));
         log.info("GP: Broadcasting text={}", message);
         log.info("GP: Text was saved to hdd and to DB: text:{}, roomId:{}", text, roomById);
     }

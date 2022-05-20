@@ -28,7 +28,7 @@ public class Server {
     }
 
     public void startTheServer() {
-        roomsRepo.createEmptyRoomAndReturnRoomId("WaitingRoom");
+        roomsRepo.createWaitingRoomAndAdmin("WaitingRoom");
         try (ServerSocket server = new ServerSocket(this.port)) {
             while (true) {
                 log.info("GP: 1 - Server is listening...");

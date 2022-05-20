@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @ToString
+@Slf4j
 public class Room {
 
     @Id
@@ -27,17 +30,26 @@ public class Room {
     @Column(name = "ROOM_ID")
     private Long roomId;
 
-
     @Column(name = "ROOM_NAME")
     private String roomName;
 
 //    @Column(name = "USERS_IN_ROOM")
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
-    private Set<User> usersInRoom /*= new HashSet<>()*/;
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER/*, cascade = CascadeType.PERSIST*/)
+    private Set<User> usersInRoom=new HashSet<>();
 
     public Room(String roomName) {
         this.roomName = roomName;
     }
+
+    public void addUser(User user){
+        if (usersInRoom == null) {
+            usersInRoom=new HashSet<>();
+        }
+        usersInRoom.add(user);
+        user.setRoom(this);
+        log.info("GP: user was added to Room:{} {}",roomId,user);
+    }
+
 
     public void broadcastToAllRoomParticipant(String chatMessage) {
         try {
