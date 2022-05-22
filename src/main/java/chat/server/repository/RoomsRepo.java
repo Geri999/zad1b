@@ -13,6 +13,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,37 @@ public class RoomsRepo implements Serializable {
 
     // todo:  @Transactional  ????
     public long createRoomAndMoveUsersToThatRoom(List<String> usersNameInvitedToChatList) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        Room room = new Room();
+        String roomName = UUID.randomUUID().toString().substring(0, 8);
+        room.setRoomName(roomName); //todo - new room's name by user
+        em.persist(room);
+        em.flush();
+        System.out.println(room);
+
+        List<User> userList = usersNameInvitedToChatList.stream().map(u -> usersRepo.findUserByName(u)).toList();
+        userList.forEach(user -> room.addUser(user));
+
+        em.merge(room);
+        em.flush();
+        em.getTransaction().commit();
+        log.info("T:1 room, merge, flush : {}", room);
+        log.info("T:2 roomName : {}", roomName);
+//        new Scanner(System.in).nextLine();
+
+        Room roomByRoomName = findRoomByRoomName(roomName);
+        Long roomId = roomByRoomName.getRoomId();
+        log.info("T:3 Room created and saved: {}", roomByRoomName);
+
+//        em.getTransaction().commit();
+        em.close();
+        return roomId;
+    }
+
+
+    public long createRoomAndMoveUsersToThatRoom1(List<String> usersNameInvitedToChatList) {
         EntityManager em = emf.createEntityManager();
 
         em.getTransaction().begin();
@@ -121,11 +153,9 @@ public class RoomsRepo implements Serializable {
 
     public Room findRoomByRoomName(String roomName) {
         EntityManager em = emf.createEntityManager();
-//        em.getTransaction().begin();
 
 //        TypedQuery<Room> query1 = em.createQuery("SELECT r FROM Room r", Room.class);
 //        System.out.println(query1.getResultList().size());
-
 
         TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomName=:roomName", Room.class);
         query.setParameter("roomName", roomName);
@@ -133,7 +163,6 @@ public class RoomsRepo implements Serializable {
         Room room = query.getSingleResult();
         System.out.println(room);
 
-//        em.getTransaction().commit();
         em.close();
         return room;
     }
@@ -151,46 +180,18 @@ public class RoomsRepo implements Serializable {
         return resultList;
     }
 
-    public List<User> findAllUsersInTheRoomByRoomId(Long roomId) {
+    public Set<User> findAllUsersInTheRoomByRoomId(Long roomId) {
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
+        log.info("T: roomId: {}", roomId);
+        var resultSet = em.createQuery("SELECT r.usersInRoom FROM Room AS r WHERE r.roomId = :roomId", Object.class)
+                .setParameter("roomId", roomId)
+                .getResultStream()
+                .peek(System.out::println)
+                .map(o->(User) o)
+                .collect(Collectors.toSet());
 
-//        TypedQuery<User> query = em.createQuery("SELECT r.usersInRoom FROM Room as r left join User as u  WHERE r.roomId = :roomId", User.class);
-        TypedQuery<User> query = em.createQuery("SELECT r.usersInRoom FROM Room AS r WHERE r.roomId = :roomId", User.class);
-        query.setParameter("roomId", roomId);
-        List<User> resultList = query.getResultList();
-
-        em.getTransaction().commit();
+        //Type specified for TypedQuery [chat.commons.entities.User] is incompatible with query return type [interface java.util.Set]
         em.close();
-        return resultList;
+        return resultSet;
     }
-
-
-
-
-
-/*    public synchronized Room findRoomById(String id) {
-        Room room = roomsList.stream().filter(s -> id.equals(s.getRoomId())).findFirst().get();
-        log.info(room.toString());
-        return room;
-    }*/
-
-    /*    public synchronized List<Room> findRoomByUserName(String senderName) {
-     *//*      List<Room> rooms = null;
-        for (Room room : roomsList) {
-            if (room.getUserListInRoom().stream().filter(s->s.getName().equals(senderName)).count()>0) rooms.add(room);
-        }*//*
-
-        List<Room> collect = roomsList.stream()
-                .filter(s -> (s.getUserListInRoom()
-                        .stream()
-                        .filter(u -> u.getName().equals(senderName))
-                        .count() > 0))
-                .collect(Collectors.toList());
-
-        log.info("List<Room> collect.size()={}",collect.size());
-        return collect;
-    }*/
-
-
 }

@@ -11,11 +11,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,7 +61,7 @@ public class CommandInterpreter {
                 IOTools.receiveAndSaveFile(socket, usersRepo);
                 break;
             case "$LEAVING_THE_ROOM_REQUEST":
-            receiveAndBroadcastChatText(message);
+                receiveAndBroadcastChatText(message);
                 //todo
                 usersRepo.removeUserFromRoom(message);
                 break;
@@ -127,12 +128,36 @@ public class CommandInterpreter {
         log.info("GP: case=$BROADCAST_TEXT_MSG, room id={}", roomId);
 
         Room roomById = roomsRepo.findRoomById(roomId);
-        List<User> usersSet = roomsRepo.findAllUsersInTheRoomByRoomId(roomId);
-        HashSet<User> users = new HashSet<>(usersSet);
-        roomById.broadcastToAllRoomParticipant(message);
+        Set<User> users = roomsRepo.findAllUsersInTheRoomByRoomId(roomId);
+        for (User user : users) {
+            Socket s = usersRepo.getUserSocket().get(user.getUserName());
+            try {
+                log.info("T: Wysyłam: {}    {}     {}", user,s, message);
+                new PrintWriter(s.getOutputStream(), true).println(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+//        broadcastToAllRoomParticipant(message, roomById);
         IOTools.saveMessageToFile(message, roomById);
         messagesTxtRepo.save(new MessageTxt(users, text));
         log.info("GP: Broadcasting text={}", message);
         log.info("GP: Text was saved to hdd and to DB: text:{}, roomId:{}", text, roomById);
     }
+
+
+/*    public void broadcastToAllRoomParticipant(String chatMessage, Room roomById) {
+        try {
+            for (User user : roomById.getUsersInRoom()) {
+                Socket socket = user.getSocket();
+                new PrintWriter(socket.getOutputStream(), true).println(chatMessage);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }*/
+
+
 }

@@ -24,18 +24,18 @@ public class ServerWorker implements Runnable {
 
     public ServerWorker(CommandInterpreter commandInterpreter) {
         this.commandInterpreter = commandInterpreter;
-        log.info("GP: ServerWorker was created ");
+        log.info("T: ServerWorker was created ");
     }
     @PostConstruct
     void postConstruct(){
-        commandInterpreter.setSocket(socket);
-        log.info("GP: PostConstruct in ServerWorker ");
+
+        log.info("T: PostConstruct in ServerWorker with socket: {}", socket);
     }
 
     @Override
     public void run() {
-        log.info("GP: Server session started... on socket:{}", socket.toString());
-
+        log.info("T: Server session started... on socket:{}", socket.toString());
+        commandInterpreter.setSocket(socket);
         try {
             BufferedReader inputS = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
@@ -43,7 +43,7 @@ public class ServerWorker implements Runnable {
             String message;
             while ((message = inputS.readLine()) != null) {
 
-                log.info("GP: Server received message:{}", message);
+                log.info("T: Server received message:{}", message);
                 commandInterpreter.commandInterpreter(message, output);
             }
         } catch (IOException e) {

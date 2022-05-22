@@ -31,7 +31,7 @@ public class User {
     @Transient
     private Socket socket;
 
-    @ManyToOne/*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
+    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*//*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
     @JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
     private Room room;
 

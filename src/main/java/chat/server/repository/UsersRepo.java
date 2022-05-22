@@ -9,7 +9,10 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
+import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 @Slf4j
@@ -19,6 +22,8 @@ public class UsersRepo {
     @Inject
     RoomsRepo roomsRepo;
 
+    Map<String, Socket> userSocket = new HashMap<>();
+
     @Inject
     public UsersRepo(EntityManagerFactory emf) {
         this.emf = emf;
@@ -27,6 +32,7 @@ public class UsersRepo {
     public void addUser(User user) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
+        userSocket.put(user.getUserName(), user.getSocket());
         Room waitingRoom = roomsRepo.findRoomByRoomName("WaitingRoom");
 //        user.setRoom(waitingRoom);  //????? "detached entity passed to persist:"
         waitingRoom.addUser(user);
@@ -34,6 +40,7 @@ public class UsersRepo {
         System.out.println(user);
 
         em.persist(user);
+        em.merge(user);
         em.getTransaction().commit();
         em.close();
     }
@@ -60,10 +67,6 @@ public class UsersRepo {
     }
 
 
-
-
-
-
     public List<User> findAllCurrentUsers() {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -75,6 +78,7 @@ public class UsersRepo {
         return resultList;
     }
 
-
-
+    public Map<String, Socket> getUserSocket() {
+        return userSocket;
+    }
 }
