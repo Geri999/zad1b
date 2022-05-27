@@ -1,4 +1,4 @@
-package chat.commons.entities;
+package rs.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

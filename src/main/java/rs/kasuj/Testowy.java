@@ -1,4 +1,4 @@
-package temp;
+package rs.kasuj;
 
 import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;

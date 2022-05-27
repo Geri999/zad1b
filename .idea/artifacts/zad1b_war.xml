@@ -7,7 +7,7 @@
         <packaging>war</packaging>
       </options>
     </properties>
-    <root id="archive" name="zad1b-1.0-SNAPSHOT.war">
+    <root id="archive" name="chat-1.war">
       <element id="artifact" artifact-name="zad1b:war exploded" />
     </root>
   </artifact>

@@ -1,4 +1,4 @@
-package chat.commons;
+package rs.logic;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,7 +1,7 @@
-package chat.server.repository;
+package rs.repository.old;
 
-import chat.commons.entities.MessageTxt;
-import chat.commons.entities.User;
+import rs.entities.MessageTxt;
+import rs.entities.User;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

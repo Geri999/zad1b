@@ -1,4 +1,4 @@
-package chat.commons.entities;
+package rs.entities;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -28,10 +27,8 @@ public class User {
     @Column(name = "USER_NAME", nullable = false)
     private String userName;
 
-    @Transient
-    private Socket socket;
-
-    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*//*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
+//    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*///*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
     private Room room;
 
@@ -47,21 +44,16 @@ public class User {
         log.info("GP: messageTxt was added to User:{}{}", messageTxt, userId);
     }
 
-    public User(String userName, Socket socket) {
-        this.userName = userName;
-        this.socket = socket;
-    }
-
     public User(String userName) {
         this.userName = userName;
     }
+
 
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", socket=" + socket+"}";
+                ", userName='" + userName;
     }
 
     @Override

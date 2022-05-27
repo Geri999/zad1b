@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="zad1b:war exploded">
-    <output-path>$PROJECT_DIR$/target/zad1b-1.0-SNAPSHOT</output-path>
+    <output-path>$PROJECT_DIR$/target/chat-1</output-path>
     <properties id="maven-jee-properties">
       <options>
         <exploded>true</exploded>
@@ -53,10 +53,13 @@
           <element id="library" level="project" name="Maven: ch.qos.logback:logback-classic:1.2.11" />
           <element id="library" level="project" name="Maven: ch.qos.logback:logback-core:1.2.11" />
           <element id="library" level="project" name="Maven: com.h2database:h2:2.1.212" />
+          <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.3.3" />
+          <element id="library" level="project" name="Maven: org.checkerframework:checker-qual:3.5.0" />
+          <element id="library" level="project" name="Maven: com.zaxxer:HikariCP:5.0.1" />
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/target/zad1b-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/target/chat-1/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="zad1b/web/Web" />
     </root>

@@ -1,8 +1,8 @@
 package chat.commons;
 
-import chat.commons.entities.Room;
-import chat.commons.entities.User;
-import chat.server.repository.UsersRepo;
+import rs.entities.Room;
+import rs.entities.User;
+import rs.repository.old.UsersRepo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -136,7 +136,7 @@ public class IOTools {
             log.info("Odbiór pliku: długość: {}, odbiorca:{}, nazwa pliku: {}", sizeOfFile, recipientName, fileName);
 
             User userByRecipientName = usersRepo.findUserByName(recipientName);
-            log.info("Odbiór pliku: znaleziony po Name:{},{}", userByRecipientName.getUserName(), userByRecipientName.getSocket());
+//            log.info("Odbiór pliku: znaleziony po Name:{},{}", userByRecipientName.getUserName(), userByRecipientName.getSocket());
 
             File file = new File(mainPath + separator + downloadFolder + separator + fileName);
 

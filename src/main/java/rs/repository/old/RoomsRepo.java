@@ -1,8 +1,8 @@
-package chat.server.repository;
+package rs.repository.old;
 
 import chat.commons.BeginAndCommit;
-import chat.commons.entities.Room;
-import chat.commons.entities.User;
+import rs.entities.Room;
+import rs.entities.User;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;

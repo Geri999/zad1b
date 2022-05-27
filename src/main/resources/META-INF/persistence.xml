@@ -5,24 +5,33 @@
              version="2.2">
     <persistence-unit name="defaultH2" transaction-type="RESOURCE_LOCAL">
 
-        <!--        <class>my.application.entities.MyEntity</class>-->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:jboss/datasources/PostgresDS</jta-data-source>
+        <class>rs.entities.Room</class>
+        <class>rs.entities.MessageTxt</class>
+        <class>rs.entities.User</class>
+
         <properties>
-            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <!--            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test"/>-->
-            <property name="javax.persistence.jdbc.url" value="jdbc:h2:./gerardDB;AUTO_SERVER=TRUE"/>
-            <property name="javax.persistence.jdbc.user" value="sa"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/gerard_db"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect"/>
 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-            <property name="hibernate.flushMode" value="FLUSH_AUTO"/>
-            <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>
+            <property name="javax.persistence.jdbc.user" value="admin"/>
+            <property name="javax.persistence.jdbc.password" value="admin"/>
 
+            <!--            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>-->
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+
+            <!--            <property name="hibernate.connection.provider_class" value="com.zaxxer.hikari.hibernate.HikariConnectionProvider"/>-->
+            <!--            <property name="hibernate.hikari.maximumPoolSize" value="10"/>-->
+
+<!--            <property name="hibernate.flushMode" value="FLUSH_AUTO"/>-->
+<!--            <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>-->
+
+            <!--            <property name="hibernate.generate_statistics" value="true"/>-->
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="false"/>
-
         </properties>
-
-
     </persistence-unit>
+
 </persistence>

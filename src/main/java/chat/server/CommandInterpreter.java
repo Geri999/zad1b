@@ -1,16 +1,17 @@
 package chat.server;
 
 import chat.commons.IOTools;
-import chat.commons.entities.MessageTxt;
-import chat.commons.entities.Room;
-import chat.commons.entities.User;
-import chat.server.repository.MessagesTxtRepo;
-import chat.server.repository.RoomsRepo;
-import chat.server.repository.UsersRepo;
+import rs.entities.MessageTxt;
+import rs.entities.Room;
+import rs.entities.User;
+import rs.repository.old.MessagesTxtRepo;
+import rs.repository.old.RoomsRepo;
+import rs.repository.old.UsersRepo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Data
+@Singleton
 public class CommandInterpreter {
     private MessagesTxtRepo messagesTxtRepo;
     private RoomsRepo roomsRepo;
@@ -71,7 +73,7 @@ public class CommandInterpreter {
     private void loginRequest(String message, PrintWriter output) {
         String[] split = message.split("\\|");
         String userName = split[1];
-        usersRepo.addUser(new User(userName, socket));
+        usersRepo.addUser(new User(userName));
         output.println("true");
         log.info("GP: User was logged and added to Waiting Room");
     }

@@ -1,4 +1,4 @@
-package chat.commons.entities;
+package rs.entities;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +46,14 @@ public class Room {
         user.setRoom(this);
         log.info("GP: user was added to Room:{} {}", roomId, user);
     }
+
+    public void deleteUser(User user) {
+        this.usersInRoom.remove(user);
+        user.setRoom(null);
+        log.info("GP: user was deleted from Room:{} {}", roomId, user);
+    }
+
+
 
     public String userListToString() {
         return usersInRoom.stream().map(User::getUserName).collect(Collectors.joining("^"));

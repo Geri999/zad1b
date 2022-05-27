@@ -1,7 +1,7 @@
-package chat.server.repository;
+package rs.repository.old;
 
-import chat.commons.entities.Room;
-import chat.commons.entities.User;
+import rs.entities.Room;
+import rs.entities.User;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -32,7 +32,7 @@ public class UsersRepo {
     public void addUser(User user) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        userSocket.put(user.getUserName(), user.getSocket());
+//        userSocket.put(user.getUserName(), user.getSocket());
         Room waitingRoom = roomsRepo.findRoomByRoomName("WaitingRoom");
 //        user.setRoom(waitingRoom);  //????? "detached entity passed to persist:"
         waitingRoom.addUser(user);

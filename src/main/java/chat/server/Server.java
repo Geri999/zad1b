@@ -1,6 +1,6 @@
 package chat.server;
 
-import chat.server.repository.RoomsRepo;
+import rs.repository.old.RoomsRepo;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
