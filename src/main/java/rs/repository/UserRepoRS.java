@@ -24,9 +24,9 @@ public class UserRepoRS {
     }
 
 
-    public void addUser(User user) {
+    public Long addUser(User user) {
 //        String userName = user.getUserName();
-        EntityManager em = /*ChatServicesRS.*/emf.createEntityManager();
+        EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         Room waitingRoom = roomRepoRS.findRoomByRoomName("WaitingRoom");
         waitingRoom.addUser(user);
@@ -36,6 +36,7 @@ public class UserRepoRS {
 
         em.getTransaction().commit();
         em.close();
+        return user.getUserId();
     }
 
     public List<User> findAllCurrentUsers() {
@@ -80,4 +81,35 @@ public class UserRepoRS {
     }
 
 
+    public void moveUserToRoom(User user, Long roomId) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        Room room = roomRepoRS.findRoomById(roomId);
+        user.setRoom(room);
+        room.addUser(user);
+        log.info("T: pointer 5 {}, USER: {}", room, user);
+        em.merge(user);
+        em.merge(room);
+//        em.persist(room);
+//        em.persist(user);
+        em.flush();
+
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public User findUserById(Long userId) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User as u WHERE u.userId = :userId", User.class)
+                .setParameter("userId", userId);
+
+        User user = query.getSingleResult();
+        em.getTransaction().commit();
+        em.close();
+
+        return user;
+    }
 }

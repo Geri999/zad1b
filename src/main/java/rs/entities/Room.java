@@ -3,7 +3,6 @@ package rs.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Slf4j
 public class Room {
 
@@ -53,10 +51,13 @@ public class Room {
         log.info("GP: user was deleted from Room:{} {}", roomId, user);
     }
 
-
-
     public String userListToString() {
         return usersInRoom.stream().map(User::getUserName).collect(Collectors.joining("^"));
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" + roomId + "," + roomName + ',' + usersInRoom + '}';
     }
 
     @Override

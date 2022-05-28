@@ -7,6 +7,7 @@ import rs.repository.RoomRepoRS;
 import rs.repository.UserRepoRS;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,9 +36,10 @@ public class ChatServicesRS {
         log.info("GP: createWaitingRoomWithAdmin()");
     }
 
-    public void loginRequest(String userName) {
-        userRepoRS.addUser(new User(userName));
+    public Long loginRequest(String userName) {
+        Long userId = userRepoRS.addUser(new User(userName));
         log.info("GP: User was logged and added to Waiting Room");
+        return userId;
     }
 
     public String currentUserListRequest() {
@@ -57,11 +59,25 @@ public class ChatServicesRS {
     }
 
 
+    public Long createChatRoomWithUsersRequest(String roomName, List<String> userList) {
+
+        List<User> userStream = userList.stream()
+                .map(s -> userRepoRS.findUserByName(s))
+                .peek(System.out::println)
+                .toList();
+        Long roomId = roomRepoRS.createRoom(roomName);
+        log.info("T: pointer 4a: {}", userList);
+
+        userStream.forEach(u -> userRepoRS.moveUserToRoom(u, roomId));
+        log.info("T: pointer 4b");
+
+        return roomId;
+    }
 
 
+    public void addUserByIdToExistingRoomById(Long roomId, Long userId) {
 
-
-
-
-
+        User user = userRepoRS.findUserById(userId);
+        userRepoRS.moveUserToRoom(user, roomId);
+    }
 }

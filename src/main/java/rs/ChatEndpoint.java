@@ -23,15 +23,17 @@ public class ChatEndpoint {
         log.info("GP: App welcome page started");
         chatServicesRS.createWaitingRoomWithAdmin();
         return "Chat 1.1 Welcome.\nDATETIME: " + LocalDateTime.now();
+        //http://localhost:8080/chat-1/chatAPI/welcome
     }
 
     @GET
     @Path("/login/{newUser}")
     @Produces("text/plain")
     public String login(@PathParam("newUser") String userName) {
-        chatServicesRS.loginRequest(userName);
+        Long userId = chatServicesRS.loginRequest(userName);
         log.info("GP: Login: {}", userName);
-        return String.format("User %s added", userName);
+        return String.format("User %s added with ID: %d (that ID will be save be Client", userName, userId);
+    //http://localhost:8080/chat-1/chatAPI/login/Gerard
     }
 
     @GET
@@ -40,6 +42,7 @@ public class ChatEndpoint {
     public String userListRequest() {
         log.info("GP: userList:");
         return String.format("Users list: %s", chatServicesRS.currentUserListRequest());
+        //http://localhost:8080/chat-1/chatAPI/userlist
     }
 
     @GET
@@ -49,27 +52,37 @@ public class ChatEndpoint {
         log.info("GP: Logout");
         chatServicesRS.logoutRequest(userName);
         return String.format("User %s removed", userName);
+        //http://localhost:8080/chat-1/chatAPI/logout/Gerard
     }
 
 
     @GET
-    @Path("/chatP2P")
+    @Path("/startChat")
     @Produces("text/plain")
-    public void chatP2P(@QueryParam("user") String user) {
-        log.info("GP: chatP2P with 1 user: {}", user);
+    public String createChatRoomWithUsers(@QueryParam("roomName") String roomName, @QueryParam("userList") List<String> userList) {
+        log.info("GP: chat started in room: {}, with users: {}", roomName,userList);
+
+        Long roomId = chatServicesRS.createChatRoomWithUsersRequest(roomName, userList);
+
+        return String.format("Chat started with users: %s in roomId: %d", userList, roomId);
+        //http://localhost:8080/chat-1/chatAPI/startChat?roomName=NewRoom&userList=Gerard&userList=Tomek
     }
 
     @GET
-    @Path("/chatM2M")
+    @Path("/addUserToChat")
     @Produces("text/plain")
-    public void chatM2M(@QueryParam("listOfUsers") List<String> listOfUsers) {
-        log.info("GP: chatM2M list 1 user: {}", listOfUsers);
+    public String assUserToChat(@QueryParam("roomId") Long roomId,@QueryParam("userId") Long userId) {
+        log.info("GP: Add user to Chat by roomId: {}, userId: {}", roomId, userId);
+
+        chatServicesRS.addUserByIdToExistingRoomById(roomId, userId);
+        return String.format("User with ID: {} added to chat in room with ID: {}", userId, roomId);
+        //http://localhost:8080/chat-1/chatAPI/addUserToChat?roomId=5&userId=6
     }
 
     @GET
     @Path("/file")
     @Produces("text/plain")
-    public void chatM2M(@QueryParam("operation") String operation,
+    public void sendFile(@QueryParam("operation") String operation,
                         @QueryParam("path") String path,
                         @QueryParam("receiver") String receiver) {
         log.info("GP: Send/Load file: {} {}", operation, path);

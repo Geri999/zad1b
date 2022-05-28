@@ -27,7 +27,7 @@ public class User {
     @Column(name = "USER_NAME", nullable = false)
     private String userName;
 
-//    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*///*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
+    //    @ManyToOne/*(cascade = {CascadeType.PERSIST, CascadeType.MERGE})*///*(fetch = FetchType.EAGER*//*, cascade = CascadeType.PERSIST*//*)*/
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ROOM_ID", referencedColumnName = "ROOM_ID")
     private Room room;
@@ -51,9 +51,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", userName='" + userName;
+        return "User{" + userId + "," + userName +",roomID:"+ room.getRoomId()+"}";
     }
 
     @Override

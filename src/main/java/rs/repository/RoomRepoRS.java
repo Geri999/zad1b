@@ -23,6 +23,21 @@ public class RoomRepoRS {
     }
 
 
+    public Long createRoom(String roomName) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        Room room = new Room(roomName);
+        em.persist(room);
+
+        em.getTransaction().commit();
+        em.close();
+
+        log.info("Room created {}", room);
+        return room.getRoomId();
+    }
+
+
     public long createWaitingRoomWithAdmin() {
         String waitingRoom = "WaitingRoom";
         String admin = "Admin";
@@ -50,16 +65,26 @@ public class RoomRepoRS {
     }
 
     public Room findRoomByRoomName(String roomName) {
-        EntityManager em = /*ChatServicesRS.*/emf.createEntityManager();
+        EntityManager em = emf.createEntityManager();
         TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomName=:roomName", Room.class);
         query.setParameter("roomName", roomName);
         Room room = query.getSingleResult();
-
         log.info("GP: finded Room By RoomName: {}", room);
-
         em.close();
         return room;
     }
+
+
+    public Room findRoomById(Long roomId){
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Room> query = em.createQuery("SELECT r FROM Room as r WHERE r.roomId=:roomId", Room.class);
+        query.setParameter("roomId", roomId);
+        Room room = query.getSingleResult();
+        log.info("GP: finded Room By Id: {}", room);
+        em.close();
+        return  room;
+    }
+
 
 
 }
